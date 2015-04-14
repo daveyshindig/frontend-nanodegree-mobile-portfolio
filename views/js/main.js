@@ -450,10 +450,17 @@ var resizePizzas = function(size) {
 
   // Iterates through pizza elements on the page and changes their widths
   function changePizzaSizes(size) {
-    for (var i = 0; i < document.querySelectorAll(".randomPizzaContainer").length; i++) {
-      var dx = determineDx(document.querySelectorAll(".randomPizzaContainer")[i], size);
-      var newwidth = (document.querySelectorAll(".randomPizzaContainer")[i].offsetWidth + dx) + 'px';
-      document.querySelectorAll(".randomPizzaContainer")[i].style.width = newwidth;
+    /* I made the following changes:
+     * 1) Pulled calculation of constants out of loops so they will not repeatedly calculate 
+     * upon each loop iteration.
+     * 2) Changed all uses of 'querySelectorAll' to (faster) 'getElementsByClassName'
+     * 3) Added 'num...' variable so DOM only is accessed once per loop iteration 
+     */
+    var dx = determineDx(document.getElementsByClassName("randomPizzaContainer")[0], size);
+    var newwidth = (document.getElementsByClassName("randomPizzaContainer")[0].offsetWidth + dx) + 'px';
+    numRandPizzaContainers = document.getElementsByClassName("randomPizzaContainer").length;
+    for (var i = 0; i < numRandPizzaContainers; i++) {      
+      document.getElementsByClassName("randomPizzaContainer")[i].style.width = newwidth;
     }
   }
 
@@ -499,12 +506,23 @@ function logAverageFrame(times) {   // times is the array of User Timing measure
 
 // Moves the sliding background pizzas based on scroll position
 function updatePositions() {
+  /* I made the following changes:
+   * 1) Pulled calculation of phase constants out of loops so they will not repeatedly calculate 
+   *    upon each loop iteration
+   * 2) Changed all uses of 'querySelectorAll' to (faster) 'getElementsByClassName'
+   */  
   frame++;
   window.performance.mark("mark_start_frame");
 
-  var items = document.querySelectorAll('.mover');
+  var items = document.getElementsByClassName('mover');
+  var phases = [];
+
+  for (var i = 0; i < 5; i++) {
+    phases[i] = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+  }
+
   for (var i = 0; i < items.length; i++) {
-    var phase = Math.sin((document.body.scrollTop / 1250) + (i % 5));
+    var phase = phases[i % phases.length];
     items[i].style.left = items[i].basicLeft + 100 * phase + 'px';
   }
 
@@ -525,7 +543,8 @@ window.addEventListener('scroll', updatePositions);
 document.addEventListener('DOMContentLoaded', function() {
   var cols = 8;
   var s = 256;
-  for (var i = 0; i < 200; i++) {
+  // There were too many pizzas so I reduced the number to 30, which was enough for my big screen
+  for (var i = 0; i < 30; i++) {
     var elem = document.createElement('img');
     elem.className = 'mover';
     elem.src = "images/pizza.png";

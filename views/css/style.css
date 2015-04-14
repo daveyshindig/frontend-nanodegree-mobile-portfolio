@@ -13,7 +13,7 @@ body {
 }
 
 input {
-  background: grey;
+  background: gray;
   font-size: 18px;
 }
 
@@ -30,6 +30,7 @@ form {
 }
 
 .mover {
+  backface-visibility: hidden;
   position: fixed;
   width: 256px;
   z-index: -1;
@@ -48,4 +49,9 @@ form {
 
  .container {
   background-color: rgba(240, 60, 60, 0.8);
+}
+
+.image-responsive {
+  max-width: 100%;
+  height: auto;
 }
